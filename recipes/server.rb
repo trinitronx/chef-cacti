@@ -30,7 +30,48 @@ include_recipe "apache2::mod_rewrite"
 include_recipe "apache2::mod_ssl"
 include_recipe "mysql::client"
 
-%w{ cacti net-snmp net-snmp-utils perl-LDAP perl-Net-SNMP php-ldap php-mysql php-pecl-apc php-snmp }.each do |p|
+
+
+if platform?("ubuntu")
+  package_list = %w{cacti snmp php5-snmp}
+  cacti_logfile = '/var/log/cacti/cacti.log'
+  
+  # Create parent dir for dbconfig-common if it does not exist
+  directory "/etc/dbconfig-common" do
+    owner "root"
+    group "root"
+    mode 00755
+  end
+
+  # Preeseed Debian dbconfig-common with database settings
+  template "/etc/dbconfig-common/cacti.conf" do
+    source "cacti_dbconfig-common.conf.erb"
+    owner "root"
+    group "root"
+    mode 00644
+    variables({
+      :database => cacti_database_info
+    })
+    notifies :reload, "service[apache2]", :delayed
+  end
+
+elsif platform?("redhat")
+  package_list = %w{ cacti net-snmp net-snmp-utils perl-LDAP perl-Net-SNMP php-ldap php-mysql php-pecl-apc php-snmp }
+  cacti_logfile = '/usr/share/cacti/log/cacti.log'
+  
+  # Configure cacti.conf ourselves
+  template "/etc/cacti/db.php" do
+    source "db.php.erb"
+    owner "cacti"
+    group "apache"
+    mode 00640
+    variables({
+      :database => cacti_database_info
+    })
+  end
+end
+
+package_list.each do |p|
   package p
 end
 
@@ -93,16 +134,6 @@ if cacti_database_info['host'] == "localhost"
     SQL
     action :query
   end
-end
-
-template "/etc/cacti/db.php" do
-  source "db.php.erb"
-  owner "cacti"
-  group "apache"
-  mode 00640
-  variables({
-    :database => cacti_database_info
-  })
 end
 
 template "/etc/httpd/conf.d/cacti.conf" do

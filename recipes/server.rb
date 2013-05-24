@@ -52,6 +52,7 @@ if platform?("ubuntu")
     variables({
       :database => cacti_database_info
     })
+    notifies :run , "execute[dpkg-reconfigure_cacti]", :delayed
     notifies :reload, "service[apache2]", :delayed
   end
 
@@ -73,6 +74,14 @@ end
 
 package_list.each do |p|
   package p
+end
+
+execute "dpkg-reconfigure_cacti" do
+  user 'root'
+  group 'root'
+  environment ( { "DEBIAN_FRONTEND" => 'noninteractive' } )
+  command "dpkg-reconfigure cacti"
+  action :nothing
 end
 
 if cacti_database_info['host'] == "localhost"

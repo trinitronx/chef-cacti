@@ -12,9 +12,9 @@
 # On httpd 2.4, change "Require host localhost" to "Require all granted".
 # On httpd 2.2, change "Allow from localhost" to "Allow from all".
 
-Alias /cacti    /usr/share/cacti
+Alias /cacti    <%= @cacti_docroot %>
 
-<Directory /usr/share/cacti/>
+<Directory <%= @cacti_docroot %>/>
   <IfModule mod_authz_core.c>
     # httpd 2.4
     Require host localhost
@@ -25,9 +25,24 @@ Alias /cacti    /usr/share/cacti
     #Deny from all
     Allow from all
   </IfModule>
+  
+  Options +FollowSymLinks
+  AllowOverride None
+
+  <IfModule mod_php5.c>
+    php_flag magic_quotes_gpc Off
+    php_flag short_open_tag On
+    php_flag register_globals Off
+    php_flag register_argc_argv On
+    php_flag track_vars On
+    # this setting is necessary for some locales
+    php_value mbstring.func_overload 0
+    php_value include_path .
+  </IfModule>
+
 </Directory>
 
-<Directory /usr/share/cacti/install>
+<Directory <%= @cacti_docroot %>/install>
   # mod_security overrides.
   # Uncomment these if you use mod_security.
   # allow POST of application/x-www-form-urlencoded during install
@@ -40,7 +55,7 @@ Alias /cacti    /usr/share/cacti
 # These sections marked "Require all denied" (or "Deny from all")
 # should not be modified.
 # These are in place in order to harden Cacti.
-<Directory /usr/share/cacti/log>
+<Directory <%= @cacti_docroot %>/log>
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
@@ -49,7 +64,7 @@ Alias /cacti    /usr/share/cacti
     Deny from all
   </IfModule>
 </Directory>
-<Directory /usr/share/cacti/rra>
+<Directory <%= @cacti_docroot %>/rra>
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>

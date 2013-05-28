@@ -23,10 +23,28 @@ default['cacti']['version']  = "0.8.8a"
 
 default['cacti']['apache2']['server_name']             = node['fqdn']
 default['cacti']['apache2']['server_aliases']          = [ node['hostname'] ]
-default['cacti']['apache2']['ssl']['certificate_file'] = "/etc/pki/tls/certs/localhost.crt"
-default['cacti']['apache2']['ssl']['chain_file']       = ""
-default['cacti']['apache2']['ssl']['force']            = false
-default['cacti']['apache2']['ssl']['key_file']         = "/etc/pki/tls/private/localhost.key"
+
+# Platform specific attributes
+case platform
+when "redhat", "centos", "scientific", "fedora", "suse", "amazon", "oracle"
+  default['cacti']['apache2']['ssl']['certificate_file'] = "/etc/pki/tls/certs/localhost.crt"
+  default['cacti']['apache2']['ssl']['chain_file']       = ""
+  default['cacti']['apache2']['ssl']['force']            = false
+  default['cacti']['apache2']['ssl']['key_file']         = "/etc/pki/tls/private/localhost.key"
+  default['cacti']['apache2']['docroot'] = '/var/www/html'
+
+  default['cacti']['log_dir'] = '/usr/share/cacti/log'
+  default['cacti']['webroot'] = '/usr/share/cacti/'
+when "debian", "ubuntu"
+  default['cacti']['apache2']['ssl']['certificate_file'] = "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+  default['cacti']['apache2']['ssl']['chain_file']       = ""
+  default['cacti']['apache2']['ssl']['force']            = false
+  default['cacti']['apache2']['ssl']['key_file']         = "/etc/ssl/private/ssl-cert-snakeoil.key"
+  default['cacti']['apache2']['docroot'] = '/var/www'
+
+  default['cacti']['log_dir'] = '/var/log/cacti'
+  default['cacti']['webroot'] = '/usr/share/cacti/site'
+end
 
 # Spine attributes
 

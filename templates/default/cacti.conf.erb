@@ -12,9 +12,9 @@
 # On httpd 2.4, change "Require host localhost" to "Require all granted".
 # On httpd 2.2, change "Allow from localhost" to "Allow from all".
 
-Alias /cacti    <%= @cacti_docroot %>
+Alias /cacti    <%= node['cacti']['webroot'] %>
 
-<Directory <%= @cacti_docroot %>/>
+<Directory <%= node['cacti']['webroot'] %>/>
   <IfModule mod_authz_core.c>
     # httpd 2.4
     Require host localhost
@@ -42,7 +42,7 @@ Alias /cacti    <%= @cacti_docroot %>
 
 </Directory>
 
-<Directory <%= @cacti_docroot %>/install>
+<Directory <%= node['cacti']['webroot'] %>/install>
   # mod_security overrides.
   # Uncomment these if you use mod_security.
   # allow POST of application/x-www-form-urlencoded during install
@@ -55,7 +55,7 @@ Alias /cacti    <%= @cacti_docroot %>
 # These sections marked "Require all denied" (or "Deny from all")
 # should not be modified.
 # These are in place in order to harden Cacti.
-<Directory <%= @cacti_docroot %>/log>
+<Directory <%= node['cacti']['webroot'] %>/log>
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
@@ -64,7 +64,7 @@ Alias /cacti    <%= @cacti_docroot %>
     Deny from all
   </IfModule>
 </Directory>
-<Directory <%= @cacti_docroot %>/rra>
+<Directory <%= node['cacti']['webroot'] %>/rra>
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>

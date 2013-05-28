@@ -34,7 +34,9 @@ include_recipe "mysql::client"
 
 if platform?("ubuntu")
   package_list = %w{cacti snmp php5-snmp}
+  apache_conf_dir = '/etc/apache2'
   cacti_logfile = '/var/log/cacti/cacti.log'
+  cacti_docroot = '/usr/share/cacti/site'
   
   # Create parent dir for dbconfig-common if it does not exist
   directory "/etc/dbconfig-common" do
@@ -44,6 +46,8 @@ if platform?("ubuntu")
   end
 
   # Preeseed Debian dbconfig-common with database settings
+  # Let dbconfig-common handle the cacti php config file
+  # (Package hardcodes this to: /etc/cacti/debian.php)
   template "/etc/dbconfig-common/cacti.conf" do
     source "cacti_dbconfig-common.conf.erb"
     owner "root"
@@ -58,7 +62,9 @@ if platform?("ubuntu")
 
 elsif platform?("redhat")
   package_list = %w{ cacti net-snmp net-snmp-utils perl-LDAP perl-Net-SNMP php-ldap php-mysql php-pecl-apc php-snmp }
+  apache_conf_dir = '/etc/httpd'
   cacti_logfile = '/usr/share/cacti/log/cacti.log'
+  cacti_docroot = '/usr/share/cacti/'
   
   # Configure cacti.conf ourselves
   template "/etc/cacti/db.php" do
@@ -102,10 +108,18 @@ if cacti_database_info['host'] == "localhost"
     notifies :run, "execute[setup_cacti_database]", :immediately
   end
 
-  execute "setup_cacti_database" do
-    cwd "/usr/share/doc/cacti-#{node['cacti']['version']}"
-    command "mysql -u root -p#{node['mysql']['server_root_password']} #{cacti_database_info['name']} < cacti.sql"
-    action :nothing
+  if platform?("redhat")
+    execute "setup_cacti_database" do
+      cwd "/usr/share/doc/cacti-#{node['cacti']['version']}"
+      command "mysql -u root -p#{node['mysql']['server_root_password']} #{cacti_database_info['name']} < cacti.sql"
+      action :nothing
+    end
+  elsif platform?("ubuntu")
+    execute "setup_cacti_database" do
+      cwd "/usr/share/doc/cacti"
+      command "zcat cacti.sql.gz | mysql -u root -p#{node['mysql']['server_root_password']} #{cacti_database_info['name']}"
+      action :nothing
+    end
   end
 
   # See this MySQL bug: http://bugs.mysql.com/bug.php?id=31061
@@ -134,10 +148,10 @@ if cacti_database_info['host'] == "localhost"
       INSERT INTO `settings` (`name`,`value`) VALUES ("path_snmpget","/usr/bin/snmpget") ON DUPLICATE KEY UPDATE `value`="/usr/bin/snmpget";
       INSERT INTO `settings` (`name`,`value`) VALUES ("path_snmpbulkwalk","/usr/bin/snmpbulkwalk") ON DUPLICATE KEY UPDATE `value`="/usr/bin/snmpbulkwalk";
       INSERT INTO `settings` (`name`,`value`) VALUES ("path_snmpgetnext","/usr/bin/snmpgetnext") ON DUPLICATE KEY UPDATE `value`="/usr/bin/snmpgetnext";
-      INSERT INTO `settings` (`name`,`value`) VALUES ("path_cactilog","/usr/share/cacti/log/cacti.log") ON DUPLICATE KEY UPDATE `value`="/usr/share/cacti/log/cacti.log";
+      INSERT INTO `settings` (`name`,`value`) VALUES ("path_cactilog","#{node['cacti']['log_dir']}/cacti.log") ON DUPLICATE KEY UPDATE `value`="#{node['cacti']['log_dir']}/cacti.log";
       INSERT INTO `settings` (`name`,`value`) VALUES ("snmp_version","net-snmp") ON DUPLICATE KEY UPDATE `value`="net-snmp";
       INSERT INTO `settings` (`name`,`value`) VALUES ("rrdtool_version","rrd-1.3.x") ON DUPLICATE KEY UPDATE `value`="rrd-1.3.x";
-      INSERT INTO `settings` (`name`,`value`) VALUES ("path_webroot","/usr/share/cacti") ON DUPLICATE KEY UPDATE `value`="/usr/share/cacti";
+      INSERT INTO `settings` (`name`,`value`) VALUES ("path_webroot","#{node['cacti']['webroot']}") ON DUPLICATE KEY UPDATE `value`="#{node['cacti']['webroot']}";
       UPDATE `user_auth` SET `password`=md5('#{cacti_admin_info['password']}'), `must_change_password`="" WHERE `username`='admin';
       UPDATE `version` SET `cacti`="#{node['cacti']['version']}";
     SQL
@@ -145,15 +159,17 @@ if cacti_database_info['host'] == "localhost"
   end
 end
 
-template "/etc/httpd/conf.d/cacti.conf" do
+template "#{node['apache']['dir']}/conf.d/cacti.conf" do
   source "cacti.conf.erb"
   owner "root"
   group "root"
   mode 00644
+  variables ({ :cacti_docroot => node['cacti']['webroot'] })
   notifies :reload, "service[apache2]", :delayed
 end
 
 web_app "cacti" do
+  docroot node['cacti']['apache2']['docroot']
   server_name node['cacti']['apache2']['server_name']
   server_aliases node['cacti']['apache2']['server_aliases']
   ssl_certificate_file node['cacti']['apache2']['ssl']['certificate_file']
@@ -163,6 +179,6 @@ end
 
 cron_d "cacti" do
   minute "*/5"
-  command "/usr/bin/php /usr/share/cacti/poller.php > /dev/null 2>&1"
+  command "/usr/bin/php #{node['cacti']['webroot']}/poller.php > /dev/null 2>&1"
   user "cacti"
 end

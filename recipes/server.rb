@@ -41,6 +41,7 @@ if platform?("ubuntu")
   apache_conf_dir = '/etc/apache2'
   cacti_logfile = '/var/log/cacti/cacti.log'
   cacti_docroot = '/usr/share/cacti/site'
+  apache_docroot = '/var/www'
   
   # Create parent dir for dbconfig-common if it does not exist
   directory "/etc/dbconfig-common" do
@@ -69,6 +70,7 @@ elsif platform?("redhat")
   apache_conf_dir = '/etc/httpd'
   cacti_logfile = '/usr/share/cacti/log/cacti.log'
   cacti_docroot = '/usr/share/cacti/'
+  apache_docroot = '/var/www/html'
   
   # Configure cacti.conf ourselves
   template "/etc/cacti/db.php" do
@@ -142,6 +144,11 @@ if cacti_database_info['host'] == "localhost"
   end
 
   # Configure base Cacti settings in database
+#   <select id="rrdtool_version" name="rrdtool_version"><option value="rrd-1.0.x">RRDTool 1.0.x</option>
+# <option value="rrd-1.2.x">RRDTool 1.2.x</option>
+# <option value="rrd-1.3.x">RRDTool 1.3.x</option>
+# <option value="rrd-1.4.x" selected="">RRDTool 1.4.x</option>
+# </select>
   mysql_database "configure_cacti_database_settings" do
     connection database_connection
     database_name cacti_database_info['name']

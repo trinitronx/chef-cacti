@@ -35,6 +35,7 @@ when "redhat", "centos", "scientific", "fedora", "suse", "amazon", "oracle"
 
   default['cacti']['log_dir'] = '/usr/share/cacti/log'
   default['cacti']['webroot'] = '/usr/share/cacti/'
+
 when "debian", "ubuntu"
   default['cacti']['apache2']['ssl']['certificate_file'] = "/etc/ssl/certs/ssl-cert-snakeoil.pem"
   default['cacti']['apache2']['ssl']['chain_file']       = ""
@@ -44,6 +45,7 @@ when "debian", "ubuntu"
 
   default['cacti']['log_dir'] = '/var/log/cacti'
   default['cacti']['webroot'] = '/usr/share/cacti/site'
+
 end
 
 # Spine attributes

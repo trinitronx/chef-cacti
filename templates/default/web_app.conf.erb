@@ -5,7 +5,7 @@
 <VirtualHost *:80>
   ServerName <%= @params[:server_name] %>
   ServerAlias <% @params[:server_aliases].each do |a| %><%= a %> <% end %>
-  DocumentRoot /var/www/html
+  DocumentRoot <%= @params[:docroot] %>
   
   CustomLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-access.log combined
   ErrorLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-error.log
@@ -22,7 +22,7 @@
 <VirtualHost *:443>
   ServerName <%= @params[:server_name] %>
   ServerAlias <% @params[:server_aliases].each do |a| %><%= a %> <% end %>
-  DocumentRoot /var/www/html
+  DocumentRoot <%= @params[:docroot] %>
 
   CustomLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-ssl-access.log combined
   ErrorLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-ssl-error.log

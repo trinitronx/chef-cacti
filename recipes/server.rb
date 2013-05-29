@@ -20,8 +20,12 @@
 
 # Load Cacti data bag
 cacti_data_bag = Chef::EncryptedDataBagItem.load("cacti","server")
-cacti_admin_info = cacti_data_bag[node.chef_environment]['admin']
-cacti_database_info = cacti_data_bag[node.chef_environment]['database']
+begin
+  cacti_admin_info = cacti_data_bag[node.chef_environment]['admin']
+  cacti_database_info = cacti_data_bag[node.chef_environment]['database']
+rescue NoMethodError
+  raise Chef::Exceptions::AttributeNotFound, "No attribute '#{node.chef_environment}' found in data_bag_item[cacti::server]. Please configure cacti::server data bag attributes for chef_environment: #{node.chef_environment}\n\nData Bag Content:\n\n-----------------\n\n#{JSON.pretty_generate(cacti_data_bag.to_hash)}"
+end
 
 # Install Cacti and dependencies
 include_recipe "apache2"

@@ -18,6 +18,9 @@
 # limitations under the License.
 #
 
+require 'stringio'
+require 'chef/mixin/command'
+
 # Load Cacti data bag
 cacti_data_bag = Chef::EncryptedDataBagItem.load("cacti","server")
 begin
@@ -84,8 +87,15 @@ elsif platform?("redhat")
   end
 end
 
+# Install each package, if cacti version attribute is set, try to install that version
 package_list.each do |p|
-  package p
+  if p == 'cacti' && ! ( node['cacti']['version'].nil? || node['cacti']['version'].empty? )
+    package p do
+     version node['cacti']['version']
+   end
+  else
+    package p
+  end
 end
 
 execute "dpkg-reconfigure_cacti" do
@@ -149,6 +159,14 @@ if cacti_database_info['host'] == "localhost"
 # <option value="rrd-1.3.x">RRDTool 1.3.x</option>
 # <option value="rrd-1.4.x" selected="">RRDTool 1.4.x</option>
 # </select>
+  
+  # Find installed cacti package version if not specified
+  if node['cacti']['version'].nil? || node['cacti']['version'].empty?
+    status = Chef::Mixin::Command.popen4( "cd #{node['cacti']['webroot']} && php -r 'include(\"./include/global.php\"); print $config[\"cacti_version\"];'" ) do |pid, stdin, stdout, stderr|
+      node.default['cacti']['version'] = stdout.read
+    end
+  end
+
   mysql_database "configure_cacti_database_settings" do
     connection database_connection
     database_name cacti_database_info['name']

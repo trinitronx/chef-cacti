@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-default['cacti']['version']  = "0.8.8a"
+default['cacti']['version'] = ""
 
 # Apache2 attributes
 

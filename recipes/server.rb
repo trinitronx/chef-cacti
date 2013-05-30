@@ -36,6 +36,7 @@ include_recipe "apache2::mod_php5"
 include_recipe "apache2::mod_rewrite"
 include_recipe "apache2::mod_ssl"
 include_recipe "mysql::client"
+include_recipe "mysql::server"
 
 
 
@@ -97,6 +98,8 @@ package_list.each do |p|
     package p
   end
 end
+
+Chef::Log.info( '-'*20 + '\n\n' + node['mysql']['server_root_password'] + '\n\n')
 
 execute "dpkg-reconfigure_cacti" do
   user 'root'

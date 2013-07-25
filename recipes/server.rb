@@ -27,7 +27,7 @@ begin
   cacti_admin_info = cacti_data_bag[node.chef_environment]['admin']
   cacti_database_info = cacti_data_bag[node.chef_environment]['database']
 rescue NoMethodError
-  raise Chef::Exceptions::AttributeNotFound, "No attribute '#{node.chef_environment}' found in data_bag_item[cacti::server]. Please configure cacti::server data bag attributes for chef_environment: #{node.chef_environment}\n\nData Bag Content:\n\n-----------------\n\n#{JSON.pretty_generate(cacti_data_bag.to_hash)}"
+  raise Chef::Exceptions::AttributeNotFound, "No attribute '#{node.chef_environment}' found in data_bag_item[cacti::server]. Please configure cacti::server data bag attributes for chef_environment: #{node.chef_environment}\n\n" # Data Bag Content:\n\n-----------------\n\n#{data_bag_content}"
 end
 
 # Install Cacti and dependencies
@@ -40,7 +40,7 @@ include_recipe "mysql::server"
 
 
 
-if platform?("ubuntu")
+if platform?("ubuntu", "debian")
   package_list = %w{cacti snmp php5-snmp}
   apache_conf_dir = '/etc/apache2'
   cacti_logfile = '/var/log/cacti/cacti.log'
@@ -86,6 +86,8 @@ elsif platform?("redhat")
       :database => cacti_database_info
     })
   end
+else
+  raise Chef::Exceptions::UnsupportedAction, "Platform '#{node['platform']}' not yet supported"
 end
 
 # Install each package, if cacti version attribute is set, try to install that version

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'erubis'
 require 'json'
+require_relative 'spec_helper'
 
 
 describe "Rendered cacti.conf apache config" do

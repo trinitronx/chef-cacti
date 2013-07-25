@@ -6,7 +6,12 @@ describe 'cacti::server' do
     stub_environment 'development' # Lines up with our test data bag in test/fixtures/data_bags/cacti/server.json
     stub_environment 'development' # Lines up with our test data bag in test/fixtures/data_bags/cacti/server.json
     chef_run = create_chefspec_runner
-    chef_run.converge described_recipe #'program_creator::default'
+
+    chef_run.node.default['mysql'] = {}
+    chef_run.node.default['mysql']['server_root_password'] = 'iloverandompasswordsbutthiswilldo'
+    chef_run.node.default['mysql']['server_repl_password'] = 'iloverandompasswordsbutthiswilldo'
+    chef_run.node.default['mysql']['server_debian_password'] = 'iloverandompasswordsbutthiswilldo'
+    chef_run.converge described_recipe  #do |node| #'cacti::server'
   }
 
   it "includes another_recipe" do

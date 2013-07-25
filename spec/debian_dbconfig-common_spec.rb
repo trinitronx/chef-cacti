@@ -35,7 +35,8 @@ describe "Debian dbconfig-common template file" do
   end
 
     it "should reflect the data bag attributes we provide" do
-        cacti_config = JSON.load(File.open( File.join(Chef::Config[:data_bag_path], 'cacti', 'server.json'), 'r'))
+
+        cacti_config = Chef::EncryptedDataBagItem.load("cacti","server")
 
         @database = cacti_config['development']['database']
 

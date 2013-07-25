@@ -5,7 +5,8 @@ module ChefSpecHelpers
         Chef::Config[:data_bag_path] = File.join(File.dirname(__FILE__), '../../test/fixtures/data_bags')
         Chef::Config[:data_bag_path] = File.join(File.dirname(__FILE__), '../../test/fixtures/data_bags')
         Chef::Config[:solo] = true
-        Chef::Config[:encrypted_data_bag_secret] = "#{ENV['HOME']}/.chef/encrypted_data_bag_secret"
+        Chef::Config[:encrypted_data_bag_secret] = File.join(File.dirname(__FILE__), '../../test/fixtures/', 'encrypted_data_bag_secret' )
+        Chef::Config[:encrypted_data_bag_secret] = File.join(File.dirname(__FILE__), '../../test/fixtures/', 'encrypted_data_bag_secret' )
     end
     def create_chefspec_runner
         setup_chefspec

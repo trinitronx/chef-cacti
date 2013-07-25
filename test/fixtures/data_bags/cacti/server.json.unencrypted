@@ -1,0 +1,14 @@
+{
+  "id": "server",
+  "development": {
+    "admin": {
+      "password": "rpZ!2sbSxmQP8ne9"
+    },
+    "database": {
+      "host": "localhost",
+      "name": "cacti",
+      "user": "cacti",
+      "password": "IqVVhw96e7Pf"
+    }
+  }
+}

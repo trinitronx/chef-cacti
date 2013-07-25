@@ -1,14 +1,1 @@
-{
-  "id": "server",
-  "development": {
-    "admin": {
-      "password": "rpZ!2sbSxmQP8ne9"
-    },
-    "database": {
-      "host": "localhost",
-      "name": "cacti",
-      "user": "cacti",
-      "password": "IqVVhw96e7Pf"
-    }
-  }
-}
+{"name":"data_bag_item_cacti_server","json_class":"Chef::DataBagItem","chef_type":"data_bag_item","data_bag":"cacti","raw_data":{"id":"server","development":{"encrypted_data":"/9e4Iw1QLxHNbb5FRJQvLMlPkhZ7B+DOilV+Tr57Ao0L4bz80fRKL+qBm1X7\n1ohFQtnKhPyHEAfQjW2CJzbONOB4MNkM244+4GV5V71KHewEg0wP9GmEihP7\nc++M+nXfeJJ4aeFRAwOGhPcFyCbvoYWS8ilcQ7ybtJW9Vvr0llkZJCkwhVSH\nHAQX/sd7AkXoCmaY4LRXijfSxBRSOnev+g==\n","iv":"pJlCYdJbth24QLQuj6dS+g==\n","version":1,"cipher":"aes-256-cbc"}}}

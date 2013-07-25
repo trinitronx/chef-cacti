@@ -22,13 +22,13 @@ describe "Debian dbconfig-common template file" do
   }
 
   def expected_output
-    expected_output_file = 'spec/resources/cacti_dbconfig-common.conf.dist'
+    expected_output_file = File.join( File.dirname(__FILE__), 'resources', 'cacti_dbconfig-common.conf.dist')
     
     File.open(expected_output_file).read
   end
 
   def rendered_output
-    input = File.open('templates/default/cacti_dbconfig-common.conf.erb', 'r').read
+    input = File.open(   File.join( File.dirname(__FILE__), '..', 'templates', 'default', 'cacti_dbconfig-common.conf.erb'), 'r').read
     eruby = Erubis::Eruby.new(input)
 
     output = eruby.result(binding())

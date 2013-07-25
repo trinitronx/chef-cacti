@@ -9,7 +9,8 @@ describe "Rendered cacti.conf apache config" do
   let(:node) { { 'fqdn' => 'unit-tester-01', 'cacti' => { 'webroot' => nil } } }
 
   def rendered_output
-    input = File.open('templates/default/cacti.conf.erb', 'r').read
+    cacti_conf_template_file = File.join( File.dirname(__FILE__), '..', 'templates', 'default', 'cacti.conf.erb')
+    input = File.open(cacti_conf_template_file, 'r').read
     eruby = Erubis::Eruby.new(input)
 
     output = eruby.result(binding())

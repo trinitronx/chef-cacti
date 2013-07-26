@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 group :test do
-    gem 'debugger'
     gem "rake"
     gem 'berkshelf'
     gem 'rspec'
@@ -15,4 +14,8 @@ group :test do
     gem 'treetop'
     gem 'strainer'
     gem 'foodcritic'
+end
+
+group :development do
+    gem 'debugger'
 end

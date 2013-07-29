@@ -101,7 +101,6 @@ package_list.each do |p|
   end
 end
 
-Chef::Log.info( '-'*20 + '\n\n' + node['mysql']['server_root_password'] + '\n\n')
 
 execute "dpkg-reconfigure_cacti" do
   user 'root'
